@@ -1,3 +1,5 @@
+extern crate libc;
+
 pub mod rk4;
 
 #[cfg(test)]
