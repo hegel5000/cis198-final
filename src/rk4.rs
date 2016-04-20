@@ -40,8 +40,15 @@ mod tests_rk4 {
     use super::*;
 
     // Test differential to give to odeint
+    #[allow(unused_variables)]
     fn velocity_one(x: f64, t: f64) -> f64 {
         1.0 // Velocity of particle is 1
+    }
+
+    #[allow(unused_variables)]
+    fn free_fall(x: f64, t: f64) -> f64 {
+        let g = -9.81;
+        g*t
     }
 
     #[test]
@@ -61,11 +68,28 @@ mod tests_rk4 {
     }
 
     #[test]
-    fn length_test() {
+    fn test_length() {
         let t = vec![0.0, 1.0, 2.0];
         let x0 = 0.0;
 
         let result = odeint(&velocity_one, x0, t);
         assert_eq!(result.len(), 3);
+    }
+
+    #[test]
+    fn test_free_fall() {
+        let mut times = Vec::<f64>::new();
+        let mut i = 0.0;
+        while i <= 10.0 {
+            times.push(i);
+            i += 0.1;
+        }
+
+        let x0 = 0.0;
+        let mut result = odeint(&free_fall, x0, times);
+        let expected_value = -490.5;
+
+        let threshold = 0.00001;
+        assert!((result.pop().unwrap() - expected_value).abs() < threshold);
     }
 }
