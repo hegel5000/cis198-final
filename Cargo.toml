@@ -1,11 +1,10 @@
 [package]
-name = "cis198_final"
+name = "scirust"
 version = "0.1.0"
 authors = ["Parker Henry <parkerh@sas.upenn.edu>", "Ian Longshore <lonian@seas.upenn.edu>"]
 
 [lib]
-name = "cis198_final"
-crate-type = ["dylib"]
+crate-type = ["dylib", "rlib"]
 
 [dependencies]
 libc = "0.2.0"
