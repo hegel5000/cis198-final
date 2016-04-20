@@ -31,7 +31,6 @@ pub fn parse_columns<T>(literal: &str) -> Result<Tensor<T>, T::Err>
     }
     min_width = min(width, min_width);
   }
-  let width = height % out.len();
   Ok(Tensor::new(out).reshape(&[min_width as isize, height as isize]))
 }
 

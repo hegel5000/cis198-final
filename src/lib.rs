@@ -4,8 +4,8 @@ extern crate numeric;
 pub mod rk4;
 
 pub mod numeric_bindings {
-  mod math;
-  mod tensor;
+  pub mod math;
+  pub mod tensor;
 }
 
 #[cfg(test)]
