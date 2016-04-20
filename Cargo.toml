@@ -3,5 +3,10 @@ name = "cis198_final"
 version = "0.1.0"
 authors = ["Parker Henry <parkerh@sas.upenn.edu>", "Ian Longshore <lonian@seas.upenn.edu>"]
 
+[lib]
+name = "cis198_final"
+crate-type = ["dylib"]
+
 [dependencies]
 libc = "0.2.0"
+numeric = "0.1.3"
