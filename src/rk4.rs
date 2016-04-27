@@ -8,6 +8,27 @@ use std::iter::Iterator;
 ///
 /// Massive caveat: this treats any input tensor as if it were 1D, and its
 /// output will automatically be 1D as well.
+///
+/// # Examples
+///
+/// ```
+/// use rk4::odeint_tensor;
+/// use numeric_bindings::Tensor;
+///
+/// fn velocity_one(x: f64, t: f64) -> f64 {
+///   1.0 // Velocity of particle is 1
+/// }
+///
+/// fn main() {
+///   let tensor = Tensor::parse_rows("0.0, 1.0, 2.0")
+///   println!("{:?}", odeint_tensor(&velocity_one, 1.0, tensor))
+/// }
+/// 
+/// ```
+///
+/// should output a big-ass array :P
+/// 
+/// 
 #[no_mangle]
 pub extern "C" fn odeint_tensor(
       dx: (&Fn(c_double, c_double) -> c_double), 
@@ -78,7 +99,7 @@ mod tests_rk4 {
     #[test]
     fn test_velocity_one() {
 
-        let t = vec![0.0, 1.0];
+        let ref t = vec![0.0, 1.0];
         let x0 = 0.0;
 
         let mut result = odeint(&velocity_one, x0, t);
@@ -88,7 +109,7 @@ mod tests_rk4 {
 
     #[test]
     fn test_length() {
-        let t = vec![0.0, 1.0, 2.0];
+        let ref t = vec![0.0, 1.0, 2.0];
         let x0 = 0.0;
 
         let result = odeint(&velocity_one, x0, t);
@@ -105,8 +126,10 @@ mod tests_rk4 {
         }
 
         let x0 = 0.0;
-        let mut result = odeint(&free_fall, x0, times);
+        let mut result = odeint(&free_fall, x0, &times);
         let expected_value = -490.5;
+
+        //println!("printing a result vector: {:?}", result);
 
         assert!((result.pop().unwrap() - expected_value).abs() < THRESHOLD);
     }

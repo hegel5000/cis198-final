@@ -39,7 +39,7 @@ pub fn parse_row<T>(literal: &str) -> Result<Tensor<T>, T::Err>
 /// parse_columns(&"7.0, 3.0, 2.0; -3.0, 2.0, -5.0")
 /// ```
 ///
-/// This returns out a 2x3 matrix: 
+/// This returns a 2x3 matrix: 
 /// ```
 /// [ 7.0  3.0 -3.0 ]
 /// [-3.0  2.0 -5.0 ]
