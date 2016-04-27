@@ -2,6 +2,7 @@ use libc::c_char;
 use numeric::tensor::Tensor;
 use std::cmp::min;
 use std::ffi::CStr;
+use std::ffi::CString;
 use std::str::FromStr;
 
 /// Maybe this could just be a function?  I'm not sure.
@@ -72,4 +73,9 @@ pub extern "C" fn parse_tensor_1_64(literal: *const c_char) -> Option<Tensor<f64
 pub extern "C" fn parse_tensor_2_64(literal: *const c_char) -> Option<Tensor<f64>> {
   let lit_from_c = unsafe_take_cstr!(literal);
   parse_rows(&lit_from_c).ok()
+}
+
+#[no_mangle]
+pub extern "C" fn repr_tensor_64(tensor: Tensor<f64>) -> *const c_char {
+  CString::new(format!("{}", tensor)).unwrap().as_ptr()
 }

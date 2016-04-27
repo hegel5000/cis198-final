@@ -1,14 +1,29 @@
 use libc::c_double;
+use std::mem::replace;
+use numeric::tensor::Tensor;
+use std::iter::Map;
+use std::iter::Iterator;
 
-/*
- * Given a differential function dx(x, t),
- * initial condition x0,
- * and a list of times t,
- * find x(t) at each point in t
- */
+/// `odeint` wrapped to take and return generalized tensors.
+///
+/// Massive caveat: this treats any input tensor as if it were 1D, and its
+/// output will automatically be 1D as well.
+#[no_mangle]
+pub extern "C" fn odeint_tensor(
+      dx: (&Fn(c_double, c_double) -> c_double), 
+      x0: c_double, 
+      t_tensor: &Tensor<c_double> ) 
+    -> Tensor<c_double> {
+  Tensor::new(odeint(dx, x0, t_tensor.data()))
+}
+
+/// Given a differential function dx(x, t),
+/// initial condition x0,
+/// and a list of times t,
+/// find x(t) at each point in t
 #[no_mangle]
 pub extern fn odeint(dx: (&Fn(c_double, c_double) -> c_double), 
-                     x0: c_double, t_vec: Vec<c_double>) -> Vec<c_double> {
+                     x0: c_double, t_vec: &Vec<c_double>) -> Vec<c_double> {
     // Need there to be at least two times for this method to work
     assert!(t_vec.len() >= 2);
 
