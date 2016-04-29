@@ -1,12 +1,8 @@
 extern crate libc;
-extern crate numeric;
 
 pub mod rk4;
-
-pub mod numeric_bindings {
-  pub mod math;
-  pub mod tensor;
-}
+pub mod vec_operations;
+pub mod vec_wrapper; 
 
 #[cfg(test)]
 #[allow(unused_imports)]
