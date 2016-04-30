@@ -4,7 +4,15 @@ use std::ffi::CStr;
 use std::ffi::CString;
 use std::ops::Deref;
 use std::str::FromStr;
-use std::mem::transmute;
+
+macro_rules! unsafe_alloc_vec_f64 { ($e:expr) => { {
+  //use std::mem::forget;
+  use std::mem::transmute;
+  let b: Box<Vec<f64>> = Box::new($e);
+  let raw: *mut Vec<f64> = unsafe { transmute(b) };
+  //forget(b);
+  raw
+} } }
 
 pub fn parse_vec<T>(literal: &str) -> Result<Vec<T>, T::Err>
     where T: FromStr + Copy {
@@ -17,8 +25,7 @@ pub fn parse_vec<T>(literal: &str) -> Result<Vec<T>, T::Err>
 
 #[no_mangle]
 pub extern "C" fn one_two() -> *mut Vec<f64> {
-  let b: Box<Vec<f64>> = Box::new(vec!(1.0, 2.0));
-  unsafe { transmute(b) }
+  unsafe_alloc_vec_f64!(vec!(1.0, 2.0))
 }
 
 ///Exportable version of parse_row.
@@ -26,28 +33,30 @@ pub extern "C" fn one_two() -> *mut Vec<f64> {
 //pub extern "C" fn parse_vec_64(literal: *const c_char) -> Option<Vec<f64>> {
 pub extern "C" fn parse_vec_64(literal: *const c_char) -> *mut Vec<f64> {
   let lit_from_c = unsafe { CStr::from_ptr(literal).to_string_lossy().into_owned() };
-  let b: Box<Vec<f64>> = Box::new(parse_vec(&lit_from_c).unwrap());
-  let out = unsafe { transmute(b) };
-  out
+  unsafe_alloc_vec_f64!(parse_vec(&lit_from_c).unwrap())
+}
+
+#[no_mangle]
+pub extern "C" fn print_vec_64(vec_c: *mut Vec<f64>) {
+  unsafe { println!("{}", repr_vec(&*vec_c)) };
 }
 
 #[no_mangle]
 pub extern "C" fn repr_vec_64(vec_c: *mut Vec<f64>) -> *const c_char {
-  unsafe { 
-    let vec: &Vec<f64> = &*vec_c;
-    let mut buf = String::new();
-    println!("\n length of foreign vector: {}", vec.len());
-    let mut i = vec.into_iter();
-    match i.next() {
-      Some(first) => { buf = buf + &first.to_string(); },
-      None => { (); },
-    }
-    for x in i {
-      buf = buf + "," + &x.to_string();
-    }
-    let out = CString::new(buf).unwrap();
-    out.as_ptr()
+  unsafe { CString::new(repr_vec(&*vec_c)).unwrap().as_ptr() }
+}
+
+pub fn repr_vec(vec: &Vec<f64>) -> String {
+  let mut buf = String::new();
+  let mut i = vec.into_iter();
+  match i.next() {
+    Some(first) => { buf = buf + &first.to_string(); },
+    None => { (); },
   }
+  for x in i {
+    buf = buf + "," + &x.to_string();
+  }
+  buf
 }
 
 #[cfg(test)]

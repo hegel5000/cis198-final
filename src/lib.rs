@@ -1,8 +1,9 @@
 extern crate libc;
 
 pub mod rk4;
-pub mod vec_operations; 
+#[macro_use]
 pub mod vec_wrapper; 
+pub mod vec_operations; 
 
 #[cfg(test)]
 #[allow(unused_imports)]
