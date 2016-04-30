@@ -1,4 +1,5 @@
 target
+doc
 Cargo.lock
 *.swp
 __pycache__/*

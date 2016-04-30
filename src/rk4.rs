@@ -1,7 +1,4 @@
 use libc::c_double;
-use std::mem::replace;
-use std::iter::Map;
-use std::iter::Iterator;
 
 /// Given a differential function dx(x, t),
 /// initial condition x0,
