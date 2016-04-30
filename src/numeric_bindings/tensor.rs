@@ -14,8 +14,8 @@ macro_rules! unsafe_take_cstr {
 /// 
 /// This takes a string in the form of comma (',') delimited list of tokens 
 /// which can be parsed as floating point numbers.
-pub fn parse_row<T>(literal: &str) -> Result<Tensor<T>, T::Err>
-  where T: FromStr + Copy { 
+pub fn parse_row<T: FromStr + Copy>(literal: &str) -> Result<Tensor<T>, T::Err>
+{ 
   let mut out = Vec::new();
   for tok in literal.split(",") {
     out.push(try!(T::from_str(tok.trim())));
@@ -33,19 +33,13 @@ pub fn parse_row<T>(literal: &str) -> Result<Tensor<T>, T::Err>
 /// Each row in the output `Tensor` works the same way as it does in `parse_row`,
 /// except that rows of the tensor can be delimited by semicolons.
 /// 
-/// # Examples
-///
-/// ```
-/// parse_columns(&"7.0, 3.0, 2.0; -3.0, 2.0, -5.0")
-/// ```
-///
 /// This returns a 2x3 matrix: 
 /// ```
 /// [ 7.0  3.0 -3.0 ]
 /// [-3.0  2.0 -5.0 ]
 /// ```
-pub fn parse_rows<T>(literal: &str) -> Result<Tensor<T>, T::Err>
-  where T: FromStr + Copy {
+pub fn parse_rows<T: FromStr + Copy>(literal: &str) -> Result<Tensor<T>, T::Err>
+{
   let mut out = Vec::new();
   let mut height = 0;
   let mut min_width = 0;
@@ -56,7 +50,11 @@ pub fn parse_rows<T>(literal: &str) -> Result<Tensor<T>, T::Err>
       out.push(try!(T::from_str(tok.trim())));
       width = width + 1;
     }
-    min_width = min(width, min_width);
+    if min_width > 0 {
+        min_width = min(width, min_width);
+    } else {
+        min_width = width;
+    }
   }
   Ok(Tensor::new(out).reshape(&[min_width as isize, height as isize]))
 }
@@ -78,4 +76,36 @@ pub extern "C" fn parse_tensor_2_64(literal: *const c_char) -> Option<Tensor<f64
 #[no_mangle]
 pub extern "C" fn repr_tensor_64(tensor: Tensor<f64>) -> *const c_char {
   CString::new(format!("{}", tensor)).unwrap().as_ptr()
+}
+
+mod tests {
+    use super::*;
+    use numeric::tensor::Tensor;
+
+    #[test]
+    fn test_parse_row() {
+        let input_str = "7.0, 3.0, 2.0, -3.0, 2.0, -5.0";
+        let result: Tensor<f64> = parse_row(&input_str).unwrap();
+        let expected = Tensor::new(vec![7.0, 3.0, 2.0, -3.0, 2.0, -5.0]);
+        assert_eq!(result.data(), expected.data());
+    }
+
+    #[test]
+    fn test_parse_rows_one_row() {
+        let input_str = "7.0, 3.0, 2.0, -3.0, 2.0, -5.0";
+        let result: Tensor<f64> = parse_rows(&input_str).unwrap();
+        println!("{:?}", *result.data());
+        let expected = Tensor::new(vec![7.0, 3.0, 2.0, -3.0, 2.0, -5.0]);
+        assert_eq!(result.data(), expected.data());
+    }
+    
+    #[test]
+    fn test_parse_rows() {
+        let input_str = "7.0, 3.0, 2.0; -3.0, 2.0, -5.0";
+        let result: Tensor<f64> = parse_rows(&input_str).unwrap();
+        println!("{:?}", *result.data());
+        let expected = Tensor::new(vec![7.0, 3.0, 2.0, -3.0, 2.0, -5.0])
+            .reshape(&[2, 3]);
+        assert_eq!(result.data(), expected.data());
+    }
 }

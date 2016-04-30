@@ -12,16 +12,16 @@ use std::iter::Iterator;
 /// # Examples
 ///
 /// ```
-/// use rk4::odeint_tensor;
-/// use numeric_bindings::Tensor;
+/// use scirust::rk4::odeint_tensor;
+/// use scirust::numeric_bindings::tensor;
 ///
 /// fn velocity_one(x: f64, t: f64) -> f64 {
 ///   1.0 // Velocity of particle is 1
 /// }
 ///
 /// fn main() {
-///   let tensor = Tensor::parse_rows("0.0, 1.0, 2.0")
-///   println!("{:?}", odeint_tensor(&velocity_one, 1.0, tensor))
+///   let tensor = tensor::parse_rows("0.0, 1.0, 2.0");
+///   println!("{:?}", odeint_tensor(&velocity_one, 1.0, tensor));
 /// }
 /// 
 /// ```
