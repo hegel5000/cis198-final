@@ -7,8 +7,7 @@ use std::iter::Iterator;
 /// initial condition x0,
 /// and a list of times t,
 /// find x(t) at each point in t
-#[no_mangle]
-pub extern "C" fn odeint(dx: (&Fn(c_double, c_double) -> c_double), 
+pub fn odeint(dx: (&Fn(c_double, c_double) -> c_double), 
                      x0: c_double, t_vec: &Vec<c_double>) -> Vec<c_double> {
     // Need there to be at least two times for this method to work
     assert!(t_vec.len() >= 2);
@@ -38,6 +37,12 @@ pub extern "C" fn odeint(dx: (&Fn(c_double, c_double) -> c_double),
         result.push(xnext);
     }
     result
+}
+
+#[no_mangle]
+pub extern "C" fn odeint_64(dx: (&Fn(c_double, c_double) -> c_double), 
+                     x0: c_double, t_vec: *mut Vec<c_double>) -> *mut Vec<c_double> {
+  unsafe { unsafe_alloc_vec_f64!(odeint(dx, x0, &*t_vec)) }
 }
 
 #[cfg(test)]

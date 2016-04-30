@@ -5,9 +5,6 @@ scirust = CDLL("target/debug/libscirust.so")
 printVec = scirust.print_vec_64
 printVec.argtypes = [c_void_p]
 
-pair = scirust.one_two
-pair.restype = c_void_p
-
 mkVec = scirust.parse_vec_64
 mkVec.restype = c_void_p
 mkVec.argtypes = [c_char_p]
