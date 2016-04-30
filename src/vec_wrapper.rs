@@ -6,15 +6,6 @@ use std::ops::Deref;
 use std::str::FromStr;
 use std::mem::transmute;
 
-/// Maybe this could just be a function?  I'm not sure.
-macro_rules! unsafe_take_cstr {
-  ($literal:expr) => ()
-}
-
-/// This is part of NumericRust's macro for making tensors.
-/// 
-/// This takes a string in the form of comma (',') delimited list of tokens 
-/// which can be parsed as floating point numbers.
 pub fn parse_vec<T>(literal: &str) -> Result<Vec<T>, T::Err>
     where T: FromStr + Copy {
   let mut out = Vec::new();
