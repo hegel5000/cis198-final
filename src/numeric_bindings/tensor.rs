@@ -72,9 +72,9 @@ pub extern "C" fn repr_tensor_64(tensor: Tensor<f64>) -> *const c_char {
   CString::new(format!("{}", tensor)).unwrap().as_ptr()
 }
 
+#[cfg(tests)]
 mod tests {
     use super::*;
-    use numeric::tensor::Tensor;
 
     #[test]
     fn test_parse_row() {

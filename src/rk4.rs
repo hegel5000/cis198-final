@@ -1,8 +1,5 @@
 use libc::c_double;
-use std::mem::replace;
 use numeric::tensor::Tensor;
-use std::iter::Map;
-use std::iter::Iterator;
 
 /// `odeint` wrapped to take and return generalized tensors.
 ///
@@ -122,7 +119,7 @@ mod tests_rk4 {
     fn test_velocity_one_tensor() {
         let t = vec![0.0, 1.0];
         let x0 = 0.0;
-        let mut result = odeint_tensor(&velocity_one, x0, &Tensor::new(t));
+        let result = odeint_tensor(&velocity_one, x0, &Tensor::new(t));
 
         assert!((result.data()[1] - 1.0).abs() < THRESHOLD);
     }

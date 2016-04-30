@@ -1,4 +1,3 @@
-use numeric::math;
 use numeric::tensor::Tensor;
 
 ///In-place element-wise addition of the first argument.

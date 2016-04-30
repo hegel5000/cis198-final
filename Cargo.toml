@@ -9,3 +9,5 @@ crate-type = ["dylib", "rlib"]
 [dependencies]
 libc = "0.2.0"
 numeric = "0.1.3"
+libhdf5-lib = "0.2.0"
+libhdf5-sys = "0.2.0"
