@@ -32,12 +32,6 @@ pub fn parse_row<T: FromStr + Copy>(literal: &str) -> Result<Tensor<T>, T::Err>
 /// 
 /// Each row in the output `Tensor` works the same way as it does in `parse_row`,
 /// except that rows of the tensor can be delimited by semicolons.
-/// 
-/// This returns a 2x3 matrix: 
-/// ```
-/// [ 7.0  3.0 -3.0 ]
-/// [-3.0  2.0 -5.0 ]
-/// ```
 pub fn parse_rows<T: FromStr + Copy>(literal: &str) -> Result<Tensor<T>, T::Err>
 {
   let mut out = Vec::new();

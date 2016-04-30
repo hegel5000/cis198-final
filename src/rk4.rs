@@ -9,23 +9,6 @@ use std::iter::Iterator;
 /// Massive caveat: this treats any input tensor as if it were 1D, and its
 /// output will automatically be 1D as well.
 ///
-/// # Examples
-///
-/// ```
-/// use scirust::rk4::odeint_tensor;
-/// use scirust::numeric_bindings::tensor;
-///
-/// fn velocity_one(x: f64, t: f64) -> f64 {
-///   1.0 // Velocity of particle is 1
-/// }
-///
-/// fn main() {
-///   let tensor = tensor::parse_rows("0.0, 1.0, 2.0");
-///   println!("{:?}", odeint_tensor(&velocity_one, 1.0, tensor));
-/// }
-/// 
-/// ```
-///
 /// should output a big-ass array :P
 /// 
 /// 
@@ -78,6 +61,7 @@ pub extern fn odeint(dx: (&Fn(c_double, c_double) -> c_double),
 #[cfg(test)]
 mod tests_rk4 {
     use super::*;
+    use numeric::tensor::Tensor;
     const THRESHOLD: f64 = 0.0000001;
 
     // Test differential to give to odeint
@@ -132,5 +116,14 @@ mod tests_rk4 {
         //println!("printing a result vector: {:?}", result);
 
         assert!((result.pop().unwrap() - expected_value).abs() < THRESHOLD);
+    }
+
+    #[test]
+    fn test_velocity_one_tensor() {
+        let t = vec![0.0, 1.0];
+        let x0 = 0.0;
+        let mut result = odeint_tensor(&velocity_one, x0, &Tensor::new(t));
+
+        assert!((result.data()[1] - 1.0).abs() < THRESHOLD);
     }
 }
