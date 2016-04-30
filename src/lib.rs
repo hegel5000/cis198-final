@@ -1,7 +1,7 @@
 extern crate libc;
 
 pub mod rk4;
-pub mod vec_operations;
+pub mod vec_operations; 
 pub mod vec_wrapper; 
 
 #[cfg(test)]
