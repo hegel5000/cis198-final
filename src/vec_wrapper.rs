@@ -1,8 +1,6 @@
 use libc::c_char;
-use std::cmp::min;
 use std::ffi::CStr;
 use std::ffi::CString;
-use std::ops::Deref;
 use std::str::FromStr;
 
 /// This is _meant_ to be `Vec<f64> -> *mut Vec<f64>.  More importantly, any 
@@ -13,7 +11,7 @@ macro_rules! unsafe_alloc_vec_f64 { ($e:expr) => { {
   //use std::mem::forget;
   use std::mem::transmute;
   let b: Box<Vec<f64>> = Box::new($e);
-  let raw: *mut Vec<f64> = unsafe { transmute(b) };
+  let raw: *mut Vec<f64> = transmute(b);
   //forget(b);
   raw
 } } }
@@ -26,7 +24,9 @@ macro_rules! unsafe_alloc_vec_f64 { ($e:expr) => { {
 /// # Examples
 ///
 /// ```
-/// assert_eq!(parse_vec("4.0,1.0,1.3").unwrap(), vec!(4.0, 1.0, 1.3))
+/// use scirust::vec_wrapper::parse_vec;
+/// let v: Vec<f64> = parse_vec("4.0,1.0,1.3").unwrap();
+/// assert_eq!(v, vec!(4.0, 1.0, 1.3))
 /// ```
 pub fn parse_vec<T>(literal: &str) -> Result<Vec<T>, T::Err>
     where T: FromStr + Copy {
@@ -40,14 +40,14 @@ pub fn parse_vec<T>(literal: &str) -> Result<Vec<T>, T::Err>
 /// This is mostly here for testing and debugging purposes on the Python side.
 #[no_mangle]
 pub extern "C" fn one_two() -> *mut Vec<f64> {
-  unsafe_alloc_vec_f64!(vec!(1.0, 2.0))
+  unsafe { unsafe_alloc_vec_f64!(vec!(1.0, 2.0)) }
 }
 
 /// FFI version of `parse_vec`.
 #[no_mangle]
 pub extern "C" fn parse_vec_64(literal: *const c_char) -> *mut Vec<f64> {
   let lit_from_c = unsafe { CStr::from_ptr(literal).to_string_lossy().into_owned() };
-  unsafe_alloc_vec_f64!(parse_vec(&lit_from_c).unwrap())
+  unsafe { unsafe_alloc_vec_f64!(parse_vec(&lit_from_c).unwrap()) }
 }
 
 /// I couldn't figure out how to get Python to deal with the arrays on the other

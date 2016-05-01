@@ -1,8 +1,8 @@
 /// FFI version of `pairwise_add`.
 #[no_mangle]
 pub extern "C" fn pairwise_add_64(x: &Vec<f64>, y: &Vec<f64>) -> *mut Vec<f64> {
-  let out = unsafe { pairwise_add(&*x, &*y) };
-  unsafe_alloc_vec_f64!(out)
+  let out = pairwise_add(&*x, &*y);
+  unsafe { unsafe_alloc_vec_f64!(out) }
 }
 
 /// Adds each element of the same index from from each `Vec`.
