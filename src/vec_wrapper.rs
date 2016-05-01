@@ -5,6 +5,10 @@ use std::ffi::CString;
 use std::ops::Deref;
 use std::str::FromStr;
 
+/// This is _meant_ to be `Vec<f64> -> *mut Vec<f64>.  More importantly, any 
+/// memory allocated with this will leak, though hopefully it will end up up
+/// deallocated by Python or whatever scripting language this goes to?
+/// TODO: write an exportable destructor
 macro_rules! unsafe_alloc_vec_f64 { ($e:expr) => { {
   //use std::mem::forget;
   use std::mem::transmute;
@@ -14,6 +18,16 @@ macro_rules! unsafe_alloc_vec_f64 { ($e:expr) => { {
   raw
 } } }
 
+/// Since there's so much more stuff out there to help with FFIing (that doesn't
+/// even grammatically make sense) C style strings, but nothing really to help
+/// with doing so with other sorts of C style arrays, I decided it would be
+/// easier only to send strings back and forth.
+///
+/// # Examples
+///
+/// ```
+/// assert_eq!(parse_vec("4.0,1.0,1.3").unwrap(), vec!(4.0, 1.0, 1.3))
+/// ```
 pub fn parse_vec<T>(literal: &str) -> Result<Vec<T>, T::Err>
     where T: FromStr + Copy {
   let mut out = Vec::new();
@@ -23,29 +37,34 @@ pub fn parse_vec<T>(literal: &str) -> Result<Vec<T>, T::Err>
   Ok(out)
 }
 
+/// This is mostly here for testing and debugging purposes on the Python side.
 #[no_mangle]
 pub extern "C" fn one_two() -> *mut Vec<f64> {
   unsafe_alloc_vec_f64!(vec!(1.0, 2.0))
 }
 
-///Exportable version of parse_row.
+/// FFI version of `parse_vec`.
 #[no_mangle]
-//pub extern "C" fn parse_vec_64(literal: *const c_char) -> Option<Vec<f64>> {
 pub extern "C" fn parse_vec_64(literal: *const c_char) -> *mut Vec<f64> {
   let lit_from_c = unsafe { CStr::from_ptr(literal).to_string_lossy().into_owned() };
   unsafe_alloc_vec_f64!(parse_vec(&lit_from_c).unwrap())
 }
 
+/// I couldn't figure out how to get Python to deal with the arrays on the other
+/// side of *const c_chars sent from Rust, so I just gave up and added this T_T.
+/// See scirust_examples.py.
 #[no_mangle]
 pub extern "C" fn print_vec_64(vec_c: *mut Vec<f64>) {
   unsafe { println!("{}", repr_vec(&*vec_c)) };
 }
 
+/// FFI version of `repr_vec`.
 #[no_mangle]
 pub extern "C" fn repr_vec_64(vec_c: *mut Vec<f64>) -> *const c_char {
   unsafe { CString::new(repr_vec(&*vec_c)).unwrap().as_ptr() }
 }
 
+/// This is essentially the inverse of `parse_vec`.
 pub fn repr_vec(vec: &Vec<f64>) -> String {
   let mut buf = String::new();
   let mut i = vec.into_iter();

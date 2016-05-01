@@ -36,6 +36,7 @@ pub fn odeint(dx: (&Fn(c_double, c_double) -> c_double),
     result
 }
 
+/// FFI version of `odeint`
 #[no_mangle]
 pub extern "C" fn odeint_64(dx: (&Fn(c_double, c_double) -> c_double), 
                      x0: c_double, t_vec: *mut Vec<c_double>) -> *mut Vec<c_double> {
