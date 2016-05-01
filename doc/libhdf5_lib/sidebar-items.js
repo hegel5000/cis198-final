@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["H5get_libversion",""],["H5open",""],["dump_build_flags",""],["hdf5_version",""]]});

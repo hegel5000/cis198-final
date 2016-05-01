@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["odeint","Given a differential function dx(x, t), initial condition x0, and a list of times t, find x(t) at each point in t"],["odeint_tensor","`odeint` wrapped to take and return generalized tensors."]]});
